@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  campaign-demo:
+    container_name: campaign-demo
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+
+    depends_on:
+      - db
+
+  campaign_redis:
+    container_name: campaign_redis
+    image: redis:alpine
+  
+  
+  campaign_worker:
+    container_name: campaign_worker
+    restart: always
+    build: .
+    command: ['sh', '-c', 'cd /app/demo && celery -A campaign worker -l info']
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - campaign_redis
+      - campaign_demo
+
+  db:
+    container_name: db
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
