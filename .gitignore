@@ -4,3 +4,4 @@ celerybeat-schedule
 venv
 .env
 *.pkl
+main.py
