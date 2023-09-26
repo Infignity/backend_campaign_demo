@@ -1,13 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
-echo "create migrations"
-python manage.py makemigrations demo
-echo "=============================="
+if [ "$DB_NAME" = "campaign_demo" ]
+then
+    echo "Waiting for postgres..."
 
-echo "migrating database"
+    while ! nc -z $DB_HOST $DB_PORT; do
+      sleep 0.1
+    done
+
+    echo "PostgreSQL started"
+fi
+
+python manage.py flush --no-input
 python manage.py migrate
-echo "=============================="
 
-echo "start server"
-python manage.py runserver 0.0.0.0:8000
-echo "==========running=================="
+exec "$@"

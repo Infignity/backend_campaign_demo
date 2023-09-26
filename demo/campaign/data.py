@@ -16,6 +16,25 @@ login_headers = {
     'x-csrf-token': 'I0Eu0rD6oWZ4tkLB-2EII_g4c2wWfbDyNLJGHSHkKDkG2x1BEoim112Srz-FT9QG_OEwJc0rvets3frPeFmGig',
 }
 
+headers = {
+    'authority': 'app.apollo.io',
+    'accept': '*/*',
+    'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    'cache-control': 'no-cache',
+    'content-type': 'application/json',
+    'origin': 'https://app.apollo.io',
+    'pragma': 'no-cache',
+    'referer': 'https://app.apollo.io/',
+    'sec-ch-ua': '"Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"macOS"',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'same-origin',
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+    'x-csrf-token': 'h7v7FpPyAZ77qGdePoV72TCP4BLqtFO-eFrilvNbMzgKFUeCBLAqcWzkqaLzFV1cQHpnQIpjWLxs-22dgovVJw',
+}
+
 extension_headers = {
     'authority': 'app.apollo.io',
     'accept': '/',
@@ -48,4 +67,24 @@ frontend_headers = {
     'sec-fetch-site': 'same-origin',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
     'x-csrf-token': '21algB21Z2jxFSQfRUnYGjVm6h7wcSCIbyOvFWAqa1sit22GrX7mKkwMsziyMqISqYgCiLVG2Vi23pYDM4fYDg',
+}
+
+cookies = {
+    '__stripe_mid': 'd4edf50e-08f8-4265-86d5-5052450fd8da82034f',
+    'messagesUtk': '250bc9dd95934d519a4bf1ef84070a54',
+    'zp__utm_medium': '(none)',
+    'zp__initial_utm_medium': '(none)',
+    'zp__initial_utm_source': '(direct)',
+    'intercom-device-id-dyws6i9m': '6dad1014-9937-4dcb-aa40-6a6843c6e635',
+    'messagesUtk': '55ea6ef015604f429a9a7d35c851bc3e',
+    'zp__initial_referrer': 'https://www.google.com/',
+    'zp__utm_source': 'www.google.com',
+    '__stripe_sid': '8e26bb45-790c-4801-892d-376bfaf70bdc56f7fa',
+    'remember_token_leadgenie_v2': 'eyJfcmFpbHMiOnsibWVzc2FnZSI6IklqWTBPVFU1TURrM1pURTBObUl6TURCa1l6YzRZekF5TkY5c1pXRmtaMlZ1YVdWamIyOXJhV1ZvWVhOb0lnPT0iLCJleHAiOiIyMDIzLTEwLTEzVDE3OjUxOjE5Ljg1OFoiLCJwdXIiOiJjb29raWUucmVtZW1iZXJfdG9rZW5fbGVhZGdlbmllX3YyIn19--21765a75a9972da5ad19618783c4d3f8d1360251',
+    'ZP_Pricing_Split_Test_Variant': '22Q4_EC_X49',
+    'GCLB': 'CN292MHxq-X1FA',
+    'X-CSRF-TOKEN': 'h7v7FpPyAZ77qGdePoV72TCP4BLqtFO-eFrilvNbMzgKFUeCBLAqcWzkqaLzFV1cQHpnQIpjWLxs-22dgovVJw',
+    '_leadgenie_session': 'xYzyiTsjdBdvjA4CVBUcxGDmRIxydSKgmW2EJdINE7sqxiLafhZ3XaD6O00zd9aG6wboHUEtZckMzk%2FUNLgXtIkvo%2F%2Bd1b9r8%2F0UyFGNswwyJYvU%2FKztOYmTPR%2F0g1RyFKW%2Bl1zOe%2BIjPC4Z6nSEo7FF%2FQmc%2F30S0tx%2FDro2W3f5VbphiDeSFjxeM6bi9sWE3h23CBIw0f%2BJgdUZLmxtYqjuUO%2F0h3tdk0pRnpt1gyav8%2BlmMX2VxaGpZJjmn3JMdfieQhmd3ptbIdkXuiIDC%2FTgcdg6tKhIeLk%3D--WEHF0BSTv9gmGYwB--uy44GLnJaDblBKmZ%2F3lqPw%3D%3D',
+    '_dd_s': 'rum=0&expire=1694629375514',
+    'intercom-session-dyws6i9m': 'eXNVNUhoMEtwQ1hLam9RdUtTdThkdi95eFFlWXNQKzFRQmYzMWtQYmFMU2JneEx5RnJPeEJGRkhtbTMrZnhuMC0tTW9WOHBGbDdxTWoxdEVjMmdvOHZPdz09--032957b19eb82d2ee31bd431409b78dd15f717e3',
 }

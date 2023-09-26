@@ -1,22 +1,33 @@
-FROM python:3.10-alphine
+# Use the official Python 3.10 image as a base image
+FROM python:3.11.4-buster
 
-# send python debugs to terminal
-ENV PYTHONUNBUFFERED =1
+# Send Python debugs to terminal
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# set working directory for docker image
-WORKDIR /app
+# install build-essential and other dependencies
+RUN apt-get update && apt-get install -y build-essential
 
-# copy the requirements for the app
+# set work directory
+WORKDIR /usr/src/app
+
+# Copy the requirements for the app
 COPY requirements.txt .
 
-# install requirements for the app
-RUN pip install -r requirements.txt
+# update pip
+RUN pip install --upgrade pip
 
-# copy project files to docker app dir
+# Install requirements for the app
+RUN pip3 install -r requirements.txt
+
+
+# copy django.sh
+COPY ./django.sh .
+RUN sed -i 's/\r$//g' /usr/src/app/django.sh
+RUN chmod +x /usr/src/app/django.sh
+
+# Copy project files to the Docker app directory
 COPY . .
 
-# expose the running port
-EXPOSE 8000
-
-# spin the server
-ENTRYPOINT [ "/app/django.sh" ]
+# run entrypoint.sh
+ENTRYPOINT ["/usr/src/app/django.sh"]

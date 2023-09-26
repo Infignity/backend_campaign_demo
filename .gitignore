@@ -5,3 +5,5 @@ venv
 .env
 *.pkl
 main.py
+
+dump.rdb

@@ -1,92 +1,174 @@
-# from django.shortcuts import render
+''' view libraries importations'''
+import os
+import json
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import requests as req
-from bs4 import BeautifulSoup
-from langchain.prompts import PromptTemplate
-# program defined functions
-from .web_scraper import scrape_website, apolo_request_sesion
-from .open_ai import get_ai_data, domain_related_route
+from celery.result import AsyncResult
+from elasticsearch import Elasticsearch
+from pymongo import MongoClient
+from bson import json_util
+from .tasks import scrape_data
+from .open_ai import LangChainAI
 
 
 class ScrapeDataAPIView(APIView):
-    ''' scrawl urls and return the https body'''
-    def post(self, request, *args, **kwargs):
-        '''a post method to get url to crawl'''
-        website_url = request.data.get('website_url')
-        linkedin_url = request.data.get('linkedin_url')
+    ''' scraping and analysis data class'''
 
-        if not (website_url and linkedin_url):
+    def post(self, request, *args, **kwargs):
+        '''a post method to scrap data sent by the client and analyze it'''
+        website_url = request.data.get('website_url')
+
+        # check that the website url and linkedin_url data is sent
+        if not (website_url):
             return Response(
-                {"error": "URL is required"},
+                {"error": "The company urls are required"},
                 status=status.HTTP_400_BAD_REQUEST
-                )
-        
-        # data = scrape_website(url)
-        resp = req.get(url=website_url).text
-        soup = BeautifulSoup(resp, 'html.parser')
-        links = soup.find_all('a')
-        company_urls = [link.get('href') for link in links if link.get('href')]
-        company_data = domain_related_route(
-            urls=company_urls,
-            target_domain= website_url
-        )
-        # use apollo to data
-        linkedin_data = apolo_request_sesion(linkedin_url=linkedin_url)
+            )
+        # check if the url supplied has https and strip it
+        if website_url.startswith("https://"):
+            website_url = website_url.replace("https://", "")
 
-        data = {
-            'company_data': company_data,
-            'linkedin_data': linkedin_data
+        # Use Celery to execute the scraping task asynchronously
+        task_result = scrape_data.delay(website_url)
+        task_id = task_result.id
+        if task_result.successful():
+            # Get the result of the task
+            data = task_result.result
+            return Response(data=data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                data=task_id,
+                status=status.HTTP_200_OK
+            )
+
+
+class TaskStatusAPIView(APIView):
+    ''' getting task status'''
+
+    def get(self, request, task_id):
+        ''' a get function to get celery task data'''
+        task = AsyncResult(task_id)
+        if task.ready():
+            # Task has completed, return the result
+            result = task.result
+            return Response(
+                {"status": "completed", "result": result},
+                status=status.HTTP_200_OK)
+        else:
+            # Task is still running or pending
+            return Response({"status": "pending"},
+                            status=status.HTTP_202_ACCEPTED)
+
+
+class GenerateEmailsAPI(APIView):
+    '''Generate Email AI'''
+
+    def post(self, request):
+        """ a post function to AI emails generated for a user"""
+        es = Elasticsearch(
+            os.environ.get('ELASTIC_DB_URL'),
+        )
+        task_id = request.data.get('task_id')
+        key_id = request.data.get('_id')
+
+        # check if task_id and key_id is sent by the client or not
+        if task_id is None or key_id is None:
+            return JsonResponse(
+                {"error": "kindly provide both the task_id and the \
+                  selected user id"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        task = AsyncResult(task_id)
+        if task.ready():
+            # Task has completed, return the result
+            result = task.result['ai_analysis']
+            print(result)
+        else:
+            return JsonResponse(
+                {"error": f"wait for the pending task with the id\
+                  {task_id} or restart the process"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Create the Elasticsearch query
+        search_query = {
+            "query": {
+                "match": {
+                    "_id": key_id
+                }
+            }
         }
+        # Execute the search query
+        resp_data = es.search(index="linked-in", body=search_query)
+        # Extract the matched user data from the response
+        person_json_data = json.dumps(resp_data['hits']['hits'], indent=4)
 
-        if company_data and linkedin_data:
+        # generate custom email for the user
+        lang_chain_ai = LangChainAI()
+        email = lang_chain_ai.email_generator(
+            person_json_data=person_json_data,
+            company_data=result
+        )
+        return Response(
+            data=email,
+            content_type='application/json',
+            status=status.HTTP_200_OK
+        )
+    
+class GenerateEmailAPI(APIView):
+    """ generate email for the profiles"""
+
+    def post(self, request):
+        """get method for generating email"""
+
+        email_ai = LangChainAI()
+        person_json_data = request.data.get("person_json_data")
+        company = request.data.get("company_data")
+
+        if not (person_json_data
+                or company
+                ):
             return Response(
-                data=data,
-                status=status.HTTP_200_OK
-                )
-        else:
-            return Response(
-                {"error": "Failed to scrape data from the URL."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        
-    def get(self, request, *args, **kwargs):
-        ''' a get method for data crawling'''
-        data = scrape_website("https://mui.com/material-ui/icons/")
-        print(data)
-        return Response({"data": "welcome"}, status=status.HTTP_200_OK)
-
-
-class PromptAPIView(APIView):
-    ''' scrawl urls and return the https body'''
-    def post(self, request, *args, **kwargs):
-        '''a post method to get url to crawl'''
-        website_url = request.data.get('website_url')
-
-        prompt_templatex = PromptTemplate(
-            input_variables=['url'],
-            template="about us getter:\n"
-                    "I want you to  provide an about for the company from"
-                    "based on the following criteria and urls:\n"
-                    "url: {url}\n"
+                {"error": "job title, user linkedin name are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = email_ai.email_generator(
+            person_json_data=person_json_data,
+            company_data=company
+        )
+        return Response(
+            data=data,
+            content_type='application/json',
+            status=status.HTTP_200_OK
         )
 
-        data = get_ai_data(
-            website_url,
-            prompt_template=prompt_templatex
+
+class GetLinkedInData(APIView):
+    '''get linkedin data'''
+
+    def post(self, request):
+        """get the linkedin data"""
+        client = MongoClient(os.environ.get("MONGO_DB_URL"))['Linked_in_db']
+        collection = client['Linked_in_1']
+        # get the username
+        person_name = request.data.get('job_title')
+        profile_doc = collection.find({'data.job_title': 'senior'}).limit(10)
+
+        # Check if the cursor is empty
+        if not profile_doc or (profile_doc is None):
+            return JsonResponse(
+                {"error": f"user with the name {person_name} not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        # Convert the cursor to a list of dictionaries
+        profile_data = [json.loads(json_util.dumps(dc)) for dc in profile_doc]
+
+        # Return the serialized data as JSON response
+        return JsonResponse(
+            {"data": profile_data, "message": "Data retrieved successfully"},
+            status=status.HTTP_200_OK
         )
-        if data:
-            return Response(
-                data=data,
-                status=status.HTTP_200_OK
-                )
-        else:
-            return Response(
-                {"error": "Failed to get URL data."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        
-    def get(self, request, *args, **kwargs):
-        ''' a get method for data crawling'''
-        return Response({"data": "welcome"}, status=status.HTTP_200_OK)
+    
