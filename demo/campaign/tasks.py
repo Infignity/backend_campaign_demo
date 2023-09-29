@@ -1,9 +1,5 @@
 """ importing necessary libs and methods """
 import os
-# import re
-# import json
-# from bson import json_util
-# from pymongo import MongoClient
 from celery import shared_task
 from elasticsearch import Elasticsearch
 from .web_scraper import WebScrapping, ApolloCompany
@@ -12,20 +8,21 @@ from .open_ai import LangChainAI
 
 class ScrapeDataTask:
     """A scrape data class """
+
     def __init__(self, website_url):
         self.website_url = website_url
         self.es_search = Elasticsearch(os.environ.get('ELASTIC_DB_URL'),)
 
     def query_should_list(self, field_name, key_list):
         ''' queries to involve'''
-        olist = []
+        resp = []
         for k in key_list:
-            olist.append({
+            resp.append({
                 "match": {
                     field_name: k
                 }
             })
-        return olist
+        return resp
 
     def run(self):
         """the delayed task to scraped data"""
@@ -39,7 +36,7 @@ class ScrapeDataTask:
         # linkedin_data = WebScrapping.apolo_request_sesion(self.linkedin_url)
         company_data_content = WebScrapping.get_all_content(
             company_related_urls
-            )
+        )
 
         # using apollo search to get companies information
         apolo = ApolloCompany(self.website_url)
@@ -52,9 +49,9 @@ class ScrapeDataTask:
         )
 
         resp_data = None
-        job_titles = campaign_data['Job Title']
-        countries = campaign_data['Countries']
-        keywords = campaign_data['Keywords']
+        job_titles = campaign_data.get('Job Title', [])
+        countries = campaign_data.get('Countries', [])
+        keywords = campaign_data.get('Keywords', [])
 
         # Check if job titles, countries
         # and keywords lists are not empty before constructing queries

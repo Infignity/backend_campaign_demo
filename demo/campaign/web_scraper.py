@@ -144,7 +144,7 @@ class ApolloCompany:
         json_data = {
             'q_organization_fuzzy_name': company_domain.strip(),
             'display_mode': 'fuzzy_select_mode',
-            'cacheKey': 1695288305479,
+            'cacheKey': os.environ.get('COMPANY_COOKIES_KEY'),
         }
         response = requests.post(
             os.environ.get('APOLO_SEARCH'),
@@ -160,12 +160,12 @@ class ApolloCompany:
 
     def get_data(self):
         '''get the company data'''
-        organization = self.search_company()
-        if organization is None:
+        org = self.search_company()
+        if org is None:
             return None
-        organization_id = organization['id']
+        org_id = org['id']
         req = requests.get(
-            f"{os.environ.get('APOLO_URL')}{organization_id}",
+            f"{os.environ.get('APOLO_URL')}{org_id}",
             cookies=cookies,
             headers=headers
         )

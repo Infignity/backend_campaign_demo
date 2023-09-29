@@ -1,0 +1,22 @@
+.venv
+.env
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+
+# Python
+campaign/__pycache__/
+campaign/*/__pycache__/
+campaign/*/*/__pycache__/
+campaign/*/*/*/__pycache__/
+.env/
+.venv/
+venv/
+
+# Local PostgreSQL data
+data/
+
+campaign/main.py

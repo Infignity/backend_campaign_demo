@@ -1,0 +1,16 @@
+*.sqlite3
+__pycache__
+celerybeat-schedule
+venv
+.env
+*.pkl
+main.py
+
+dump.rdb
+
+
+campaign/__pycache__/
+campaign/*/__pycache__/
+campaign/dumps.py
+campaign/*/*/__pycache__/
+campaign/*/*/*/__pycache__/

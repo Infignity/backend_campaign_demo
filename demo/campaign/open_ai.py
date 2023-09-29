@@ -1,39 +1,97 @@
 '''importing program modules'''
 import os
 import re
+import json
 from langchain.llms import OpenAI
 from langchain.chains import llm
 from .templates import analyst_template, campaign_template, email_prompt
-# analyst_template, campaign_template, email_prompt
 
 
 class LangChainAI:
     '''Company Data analysis'''
+
     def __init__(self):
         self.open_ai_key = os.environ.get("OPENAI_API_KEY")
         self.llm_ai = OpenAI(temperature=0.9, openai_api_key=self.open_ai_key)
 
     def analysis_extractor(self, text):
         '''extract the company analyzed data'''
-        print(text)
-        # regular expression pattern to match section headers and their content
-        pattern = r'([0-9]+\.[a-z]+\.[a-zA-Z\s]+:\n(?:-\s[^\n]+\n)+)'
-        # Using re.findall to find all matching sections
-        sections = re.findall(pattern, text)
+        # Split the text into lines
+        lines = f"{text}".strip().split('\n')
+        # Initialize variables
         data = {}
-        # Iterate through the matched sections and extract data
-        for section in sections:
-            lines = section.strip().split('\n')
-            header = lines[0].strip()
-            content = [line.strip('- ').strip() for line in lines[1:]]
-            data[header] = content
-        return data
+        current_main_header = ""
+        current_sub_header = ""
+        current_body = []
+
+        for line in lines:
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+            if not re.match(r"^\d+", line) and line.endswith(":"):
+                # Identify main headers
+                current_main_header = line[:-1]
+                data[current_main_header] = {}
+            # elif re.match(r"^\d+\.\w+\.", line):
+            elif re.match(r"^\d+.*:$", line):
+                # Identify sub-headers
+                current_sub_header = line
+                data[current_main_header][current_sub_header] = []
+            elif line.startswith("- "):
+                # Add content to the current sub-header's body
+                current_body.append(line[2:])
+            else:
+                pass
+            # Update the data structure
+            if current_main_header and current_sub_header:
+                data[current_main_header][current_sub_header] = current_body
+        output_data = {}
+        for main_header, sub_headers in data.items():
+            flattened_body = []
+            for _, body in sub_headers.items():
+                flattened_body.extend(body)
+            output_data[main_header] = flattened_body
+        return json.dumps(output_data, indent=4)
     
+    def analysis_extractor_main(self, text):
+        '''extract the company analyzed data'''
+        # Define regular expressions to extract data
+        main_header_pattern = r'^\d+\.\s+(.*?):$'
+        sub_header_pattern = r'^\s*([a-z]\.)\s(.*?):$'
+        content_pattern = r'^\s*-\s(.+)$'
+        # Initialize variables to store extracted data
+        data = {}
+        current_main_header = ""
+        current_sub_header = ""
+
+        # Split the sample_text into lines
+        lines = f"{text}".strip().split('\n')
+
+        # Iterate through the lines and extract data
+        for line in lines:
+            main_header_match = re.match(main_header_pattern, line)
+            sub_header_match = re.match(sub_header_pattern, line)
+            content_match = re.match(content_pattern, line)
+            
+            if main_header_match:
+                current_main_header = main_header_match.group(1)
+                data[current_main_header] = {}
+            elif sub_header_match:
+                current_sub_header = sub_header_match.group(2)
+                if current_sub_header and current_main_header:
+                    data[current_main_header][current_sub_header] = []
+            elif content_match and (current_main_header in data
+                                    and current_sub_header in
+                                    data[current_main_header]):
+                data[current_main_header][current_sub_header].append(
+                    content_match.group(1))
+        return data
+
     def job_analysis_extractor(self, text):
         '''job list extractors'''
         # a regular exp pattern to match numbered list items along with headers
         pattern = r'(?P<number>\d+)\.\s(?P<header>[^:]+):\s(?P<items>.+)'
-
         # Use re.finditer to find all matching sections
         matches = re.finditer(pattern, text)
         data = {}
@@ -75,8 +133,8 @@ class LangChainAI:
         if current_section and current_data:
             extracted_data[current_section] = '\n'.join(current_data)
         return extracted_data
-    
-    def reduce_prompt_length(self, text, max_tokens=2000):
+
+    def reduce_token_length(self, text, max_tokens=2000):
         """
         Truncate the input text to the specified maximum number of tokens.
         """
@@ -92,29 +150,36 @@ class LangChainAI:
             llm=self.llm_ai,
             prompt=analyst_template
         )
-        print(company_data)
         company_text = ' '.join(company_data)
-        truncated_data = self.reduce_prompt_length(company_text, 500)
+        # reduce the number of token
+        truncated_data = self.reduce_token_length(company_text, 500)
         input_data = {
             'company_data': truncated_data,
             'company_json': json_data,
         }
-        analysis_result = chained_llm.run(input_data)
-        # print(data)
-        # analysis_result = self.extract_and_format_data(data)
-        print(analysis_result)
-        print("="*10, 'analysis data', "="*10,)
+        # force result generation for a number of loop
+        max_iterations = 10
+        i = 0
+        analysis_result = None
+        while i < max_iterations and analysis_result is None:
+            analysis_result = chained_llm.run(input_data)
+            i += 1
+        analysis_result = self.analysis_extractor_main(analysis_result)
+        # print(analysis_result)
+        # print("="*10, 'analysis data', "="*10,)
         # analyze the job description
-        
         campaign_llm = llm.LLMChain(
             llm=self.llm_ai,
             prompt=campaign_template
         )
-        campaign_data = campaign_llm.run(input_data)
+        campaign_data = None
+        x = 0
+        while x < max_iterations and campaign_data is None:
+            campaign_data = campaign_llm.run(input_data)
+            x += 1
         campaign_result = self.job_analysis_extractor(campaign_data)
-        print(campaign_result)
-        print("="*10, 'campaign data', "="*10,)
-        
+        # print(campaign_result)
+        # print("="*10, 'campaign data', "="*10,)
         return analysis_result, campaign_result
 
     def email_generator(
@@ -122,7 +187,6 @@ class LangChainAI:
             person_json_data,
             company_data):
         ''' an email generator language model'''
-        
         chained_llm = llm.LLMChain(
             llm=self.llm_ai,
             prompt=email_prompt
@@ -131,5 +195,11 @@ class LangChainAI:
             'company_data': company_data,
             'person_json_data': person_json_data
         }
-        data = chained_llm.run(input_data)
+        i = 0
+        data = None
+        # try to generate data for some number of time if data is empty
+        max_iterations = 10
+        while i < max_iterations and data is None:
+            data = chained_llm.run(input_data)
+            i += 1
         return data

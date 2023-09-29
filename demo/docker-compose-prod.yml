@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:alpine
+    container_name: campaign_redis
+
+  app:
+    container_name: campaign_demo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    env_file:
+      - /.env
+    command: gunicorn demo.wsgi --bind 0.0.0.0:8000
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - ./app/:/usr/src/app/
+
+  # configuring nginx
+  nginx:
+    container_name: nginx_campaign
+    build:
+      context: ./
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    volumes:
+      - .:/app
+
+  # celery 
+  celery:
+    container_name: campaign_celery
+    restart: always
+    build:
+      context: .
+    # command: ['sh', '-c', 'cd /app/demo && celery -A campaign worker -l info']
+    command: celery -A demo worker -l DEBUG
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+      - app
+
+volumes:
+  postgres_data:

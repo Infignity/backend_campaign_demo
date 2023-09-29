@@ -85,7 +85,6 @@ class GenerateEmailsAPI(APIView):
         if task.ready():
             # Task has completed, return the result
             result = task.result['ai_analysis']
-            print(result)
         else:
             return JsonResponse(
                 {"error": f"wait for the pending task with the id\
@@ -102,14 +101,32 @@ class GenerateEmailsAPI(APIView):
             }
         }
         # Execute the search query
-        resp_data = es.search(index="linked-in", body=search_query)
-        # Extract the matched user data from the response
-        person_json_data = json.dumps(resp_data['hits']['hits'], indent=4)
+        resp_data = es.search(
+            index="linked-in",
+            body=search_query)['hits']['hits'],
+        
+        # check that elastic search returned a response
+        if not resp_data:
+            return JsonResponse(
+                {"error": f" No compay with the id : {key_id}"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        dict_json = dict(resp_data[0][0]['_source'].items())
+        selected_data = {
+            "full_name": dict_json.get("full_name"),
+            "job_title_role": dict_json.get("job_title_role"),
+            "skills": dict_json.get("skills"),
+            "experience": dict_json.get("experience")[-1] if
+            dict_json.get("experience") else [],
+            "job_title": dict_json.get("job_title")
+        }
+        json_object = json.dumps(selected_data, indent=4)
 
         # generate custom email for the user
         lang_chain_ai = LangChainAI()
         email = lang_chain_ai.email_generator(
-            person_json_data=person_json_data,
+            person_json_data=json_object,
             company_data=result
         )
         return Response(
@@ -117,7 +134,8 @@ class GenerateEmailsAPI(APIView):
             content_type='application/json',
             status=status.HTTP_200_OK
         )
-    
+
+
 class GenerateEmailAPI(APIView):
     """ generate email for the profiles"""
 
@@ -153,6 +171,7 @@ class GetLinkedInData(APIView):
         """get the linkedin data"""
         client = MongoClient(os.environ.get("MONGO_DB_URL"))['Linked_in_db']
         collection = client['Linked_in_1']
+
         # get the username
         person_name = request.data.get('job_title')
         profile_doc = collection.find({'data.job_title': 'senior'}).limit(10)
@@ -171,4 +190,3 @@ class GetLinkedInData(APIView):
             {"data": profile_data, "message": "Data retrieved successfully"},
             status=status.HTTP_200_OK
         )
-    
