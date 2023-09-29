@@ -28,6 +28,8 @@ jobs:
       - name: Testing variable
         run: |
           echo $APOLO_CONTACT
+      - name: List contents of demo directory
+        run: ls -l demo
       - name: Build the Docker image
         run: cd demo && docker-compose up
       - name: Push to docker registry
