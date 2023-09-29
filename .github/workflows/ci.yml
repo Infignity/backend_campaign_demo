@@ -27,6 +27,6 @@ jobs:
         run: |
           echo $APOLO_CONTACT
       - name: Build the Docker image
-        run: cd demo && docker-compose up
+        run: cd ../../demo && docker-compose up
       - name: Push to docker registry
         run: docker push magicpitch/campaign_demo:lastest
