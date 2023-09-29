@@ -15,16 +15,20 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: docker login $DOCKER_URL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      # - name: Create an env file
+      #   run: |
+      #     echo "${{ secrets.magicpith_env }}" > .env
+      # - name: Change directory to demo
+      #   run: cd demo
+      # - name: Load environment variables from .env
+      #   run: |
+      #     set -a
+      #     source .env
+      #     set +a
       - name: Create an env file
         run: |
-          echo "${{ secrets.magicpith_env }}" > .env
-      - name: Change directory to demo
-        run: cd demo
-      - name: Load environment variables from .env
-        run: |
-          set -a
-          source .env
-          set +a
+          echo "${{ secrets.magicpith_env }}" > demo/.env
+        shell: bash
       - name: Testing variable
         run: |
           echo $APOLO_CONTACT
