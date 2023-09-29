@@ -18,6 +18,8 @@ jobs:
       - name: Create an env file
         run: |
           echo "${{ secrets.magicpith_env }}" > .env
+      - name: Change directory to demo
+        run: cd demo
       - name: Load environment variables from .env
         run: |
           set -a
@@ -27,6 +29,6 @@ jobs:
         run: |
           echo $APOLO_CONTACT
       - name: Build the Docker image
-        run: cd demo && docker-compose up
+        run: docker-compose up
       - name: Push to docker registry
         run: docker push magicpitch/campaign_demo:lastest

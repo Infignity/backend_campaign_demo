@@ -4,6 +4,7 @@ celerybeat-schedule
 venv
 
 .env
+demo/.env
 *.pkl
 demo/main.py
 
