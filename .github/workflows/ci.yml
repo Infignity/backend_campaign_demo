@@ -18,9 +18,14 @@ jobs:
       - name: Create an env file
         run: |
           echo "${{ secrets.magicpith_env }}" > .env
+      - name: Load environment variables from .env
+        run: |
+          set -a
+          source .env
+          set +a
       - name: Testing variable
         run: |
-          echo ${{ APOLO_CONTACT }}
+          echo $APOLO_CONTACT
       - name: Build the Docker image
         run: cd demo && docker-compose up
       - name: Push to docker registry
