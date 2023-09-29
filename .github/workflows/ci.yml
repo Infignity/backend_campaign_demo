@@ -1,0 +1,21 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: ["main"]
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login into Docker
+        env:
+          DOCKER_URL: ${secrets.DOCKER_URL}
+          DOCKER_USERNAME: ${secrets.DOCKER_USERNAME}
+          DOCKER_PASSWORD: ${secrets.DOCKER_PASSWORD}
+        run: docker login $DOCKER_URL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - name: Build the Docker image
+        run: docker-compose up
+      - name: Push to docker registry
+        run: docker push magicpitch/campaign_demo:lastest
