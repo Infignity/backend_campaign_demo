@@ -22,7 +22,6 @@ jobs:
       #   run: cd demo
       # - name: Load environment variables from .env
       #   run: |
-      #     set -a
       #     source .env
       #     set +a
       - name: Create an env file
