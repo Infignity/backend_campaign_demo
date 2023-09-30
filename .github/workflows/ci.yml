@@ -14,7 +14,7 @@ jobs:
           DOCKER_URL: ${{ secrets.DOCKER_URL }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: docker login $DOCKER_URL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - name: Create an env file
         run: |
           echo "${{ secrets.magicpith_env }}" > demo/.env
