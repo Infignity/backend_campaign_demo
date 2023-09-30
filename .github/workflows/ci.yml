@@ -21,11 +21,18 @@ jobs:
         shell: bash
       - name: List contents of demo directory
         run: ls -l demo
-      - name: Build the Docker image
-        run: cd demo && docker-compose up -d
-      - name: Push to docker registry
+      - name: Build and push Docker images using Docker Compose
         run: |
-          docker push magicpitch/campaign_demo:lastest
-          docker push magicpitch/campaign_celery:lastest
-          docker push magicpitch/postgres_db:lastest
-          docker push magicpitch/campaign_redis:lastest
+          # Navigate to the docker-compose.yml file
+          cd demo
+          # Build and push the Docker images using Docker Compose
+          docker-compose build
+          docker-compose push
+      # - name: Build the Docker image
+      #   run: cd demo && docker-compose up -d
+      # - name: Push to docker registry
+      #   run: |
+      #     docker push magicpitch/campaign_demo:lastest
+      #     docker push magicpitch/campaign_celery:lastest
+      #     docker push magicpitch/postgres_db:lastest
+      #     docker push magicpitch/campaign_redis:lastest
