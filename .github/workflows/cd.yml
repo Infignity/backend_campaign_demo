@@ -25,25 +25,6 @@ jobs:
           sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/celery_demo:lastest || true
         continue-on-error: true
 
-      - name: Delete old docker postgres_db images
-        run: |
-          sudo docker stop postgres_db || true
-          sudo docker rm postgres_db || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest || true
-        continue-on-error: true
-      - name: Delete old docker campaign_redis images
-        run: |
-          sudo docker stop campaign_redis || true
-          sudo docker rm campaign_redis || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest || true
-        continue-on-error: true
-
-      - name: Pull the Docker Campaign Redis Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
-
-      - name: Pull the Docker Database Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
-
       - name: Pull the Docker Campaign Celery Images
         run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
 
