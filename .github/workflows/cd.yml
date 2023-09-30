@@ -15,40 +15,40 @@ jobs:
         run: |
           sudo docker stop campaign_demo || true
           sudo docker rm campaign_demo || true
-          sudo docker rmi magicpitch/campaign_demo:lastest || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest || true
         continue-on-error: true
 
       - name: Delete old docker Celery images
         run: |
           sudo docker stop celery_demo || true
           sudo docker rm celery_demo || true
-          sudo docker rmi magicpitch/celery_demo:lastest || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/celery_demo:lastest || true
         continue-on-error: true
 
       - name: Delete old docker postgres_db images
         run: |
           sudo docker stop postgres_db || true
           sudo docker rm postgres_db || true
-          sudo docker rmi magicpitch/postgres_db:lastest || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest || true
         continue-on-error: true
       - name: Delete old docker campaign_redis images
         run: |
           sudo docker stop campaign_redis || true
           sudo docker rm campaign_redis || true
-          sudo docker rmi magicpitch/campaign_redis:lastest || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest || true
         continue-on-error: true
 
       - name: Pull the Docker Campaign Redis Images
-        run: sudo docker pull magicpitch/campaign_redis:lastest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
 
       - name: Pull the Docker Database Images
-        run: sudo docker pull magicpitch/postgres_db:lastest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
 
       - name: Pull the Docker Campaign Celery Images
-        run: sudo docker pull magicpitch/campaign_redis:lastest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
 
       - name: Pull the Docker Celery Demo Images
-        run: sudo docker pull magicpitch/celery_demo:lastest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/celery_demo:lastest
 
       - name: Run the images
-        run: docker run -d -p 8000:8000 --name campaign_demo magicpitch/campaign_demo
+        run: docker run -d -p 8000:8000 --name campaign_demo ${{ secrets.DOCKER_USERNAME }}/campaign_demo
