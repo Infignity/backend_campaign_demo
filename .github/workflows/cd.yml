@@ -8,28 +8,34 @@ on:
 
 jobs:
 
+
   build:
     runs-on: self-hosted
+
+    services:
+      redis:
+        image: redis
+
     steps:
-      - name: Delete old docker campaign images
-        run: |
-          sudo docker stop campaign_celery || true
-          sudo docker rm campaign_celery || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
-        continue-on-error: true
+      # - name: Delete old docker campaign images
+      #   run: |
+      #     sudo docker stop campaign_celery || true
+      #     sudo docker rm campaign_celery || true
+      #     sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
+      #   continue-on-error: true
 
       - name: Delete old docker Celery images
         run: |
-          sudo docker stop celery_demo || true
-          sudo docker rm celery_demo || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/celery_demo:lastest || true
+          sudo docker stop campaign_demo || true
+          sudo docker rm campaign_demo || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest || true
         continue-on-error: true
 
-      - name: Pull the Docker Campaign Celery Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+      # - name: Pull the Docker Campaign Celery Images
+      #   run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
       - name: Pull the Docker Celery Demo Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/celery_demo:lastest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
 
       - name: Run the images
-        run: docker run -d -p 8000:8000 --name campaign_demo ${{ secrets.DOCKER_USERNAME }}/campaign_demo
+        run: cd demo && docker compose up -d
