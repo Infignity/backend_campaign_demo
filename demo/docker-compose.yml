@@ -13,7 +13,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:lastest
+    image: redis
     container_name: campaign_redis
     ports:
       - "6379:6379"
