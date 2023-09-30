@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Deploy to Server
-      uses: appleboy/ssh-actions@master
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SHH_USER }}
