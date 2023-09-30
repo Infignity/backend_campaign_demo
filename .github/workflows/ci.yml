@@ -15,12 +15,6 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: docker login $DOCKER_URL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      # - name: Change directory to demo
-      #   run: cd demo
-      # - name: Load environment variables from .env
-      #   run: |
-      #     source .env
-      #     set +a
       - name: Create an env file
         run: |
           echo "${{ secrets.magicpith_env }}" > demo/.env
@@ -30,4 +24,8 @@ jobs:
       - name: Build the Docker image
         run: cd demo && docker-compose up -d
       - name: Push to docker registry
-        run: docker push magicpitch/campaign_demo:lastest
+        run: |
+          docker push magicpitch.azureci.io/campaign_demo:lastest
+          docker push magicpitch.azureci.io/campaign_celery:lastest
+          docker push magicpitch.azureci.io/postgres_db:lastest
+          docker push magicpitch.azureci.io/campaign_redis:lastest
