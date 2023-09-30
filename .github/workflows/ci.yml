@@ -21,12 +21,22 @@ jobs:
         shell: bash
       - name: List contents of demo directory
         run: ls -l demo
-      - name: Build and push Docker images using Docker Compose
+      - name: Build the Docker images using Docker Compose
         run: |
           # Navigate to the docker-compose.yml file
           cd demo
           # Build the Docker images using Docker Compose
           docker-compose build
-          # Push the images using the correct names
-          docker-compose push
+          # Tag the images with container names
+          docker tag campaign_demo ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+          docker tag campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+          docker tag postgres_db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
+          docker tag campaign_redis ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
         shell: bash
+      - name: Push Docker images using container names
+        run: |
+          # Push the Docker images using container names
+          docker push ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+          docker push ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+          docker push ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
+          docker push ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
