@@ -28,10 +28,11 @@ jobs:
           # Build the Docker images using Docker Compose
           docker-compose build
           # Tag the images with container names
-          docker tag app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-          docker tag celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
-          docker tag db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
+          docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+          docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+          docker tag postgres ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
           docker tag redis ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
+          
         shell: bash
       - name: Push Docker images using container names
         run: |
