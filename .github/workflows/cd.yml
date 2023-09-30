@@ -12,6 +12,10 @@ jobs:
   build:
     runs-on: self-hosted
 
+    container:
+      image: docker:20.10.8
+      options: --privileged  # Required for Docker-in-Docker
+
     services:
       redis:
         image: redis
@@ -24,27 +28,31 @@ jobs:
     #     username: ${{ secrets.SHH_USER }}
     #     key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Set up Docker Compose
+        run: |
+          apk add --no-cache docker-compose
+          docker --version
+          docker-compose --version
+
       - name: Delete old docker campaign images
         run: |
-          sudo docker stop campaign_celery || true
-          sudo docker rm campaign_celery || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
-        # continue-on-error: true
+          docker stop campaign_celery || true
+          docker rm campaign_celery || true
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
 
       - name: Delete old docker Celery images
         run: |
-          sudo docker stop campaign_demo || true
-          sudo docker rm campaign_demo || true
-          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest || true
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+          docker stop campaign_demo || true
+          docker rm campaign_demo || true
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
           cd demo && docker compose up -d
-        # continue-on-error: true
 
       - name: Pull the Docker Campaign Celery Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
       - name: Pull the Docker Celery Demo Images
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
 
       - name: Run the images
-        run: cd demo && docker compose up -d
+        run: docker compose up -d
