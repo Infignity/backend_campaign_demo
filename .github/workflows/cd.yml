@@ -28,31 +28,24 @@ jobs:
     #     username: ${{ secrets.SHH_USER }}
     #     key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Set up Docker Compose
-        run: |
-          apk add --no-cache docker-compose
-          docker --version
-          docker-compose --version
-
-      - name: Delete old docker campaign images
+      - name: Delete old Docker campaign_celery container
         run: |
           docker stop campaign_celery || true
           docker rm campaign_celery || true
-          docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
 
-      - name: Delete old docker Celery images
+      - name: Pull the Docker Campaign Celery Image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+
+      - name: Run the Docker Campaign Celery Container
+        run: docker run -d --name campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+
+      - name: Delete old Docker campaign_demo container
         run: |
           docker stop campaign_demo || true
           docker rm campaign_demo || true
-          docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest || true
-          docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-          cd demo && docker compose up -d
 
-      - name: Pull the Docker Campaign Celery Images
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
-
-      - name: Pull the Docker Celery Demo Images
+      - name: Pull the Docker Campaign Demo Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
 
-      - name: Run the images
-        run: docker compose up -d
+      - name: Run the Docker Campaign Demo Container
+        run: docker run -d --name campaign_demo ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
