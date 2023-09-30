@@ -25,9 +25,6 @@ jobs:
         run: |
           echo "${{ secrets.magicpith_env }}" > demo/.env
         shell: bash
-      - name: Testing variable
-        run: |
-          echo $APOLO_CONTACT
       - name: List contents of demo directory
         run: ls -l demo
       - name: Build the Docker image
