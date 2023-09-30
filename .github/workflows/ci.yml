@@ -28,6 +28,6 @@ jobs:
       - name: List contents of demo directory
         run: ls -l demo
       - name: Build the Docker image
-        run: cd demo && docker-compose up
+        run: cd demo && docker-compose up -d
       - name: Push to docker registry
         run: docker push magicpitch/campaign_demo:lastest
