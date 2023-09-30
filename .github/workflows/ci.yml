@@ -19,25 +19,14 @@ jobs:
         run: |
           echo "${{ secrets.magicpith_env }}" > demo/.env
         shell: bash
-      - name: List contents of demo directory
-        run: ls -l demo
       - name: Build the Docker images using Docker Compose
         run: |
           # Navigate to the docker-compose.yml file
           cd demo
           # Build the Docker images using Docker Compose
-          docker-compose up -d
-          # Tag the images with container names
-          # docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-          # docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
-          # docker tag demo_db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
-          # docker tag redis ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest 
+          docker-compose build -t demo-app
+          # Tag the images with your Docker Hub repository name and version
+          docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+          # Push the images to Docker Hub
+          docker push ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
         shell: bash
-      # - name: Push Docker images using container names
-      #   run: |
-      #     # Push the Docker images using container names
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
-          
