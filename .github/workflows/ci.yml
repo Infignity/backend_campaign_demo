@@ -28,10 +28,10 @@ jobs:
           # Build the Docker images using Docker Compose
           docker-compose build
           # Tag the images with container names
-          docker tag demo_app magicpitch/campaign_demo:lastest
-          docker tag demo_celery magicpitch/campaign_celery:lastest
-          docker tag demo_db magicpitch/postgres_db:lastest
-          docker tag demo_redis magicpitch/campaign_redis:lastest
+          docker tag campaign_demo magicpitch/campaign_demo:lastest
+          docker tag campaign_celery magicpitch/campaign_celery:lastest
+          docker tag postgres_db magicpitch/postgres_db:lastest
+          docker tag campaign_redis magicpitch/campaign_redis:lastest
         shell: bash
       - name: Push Docker images using container names
         run: |
