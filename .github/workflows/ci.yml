@@ -27,12 +27,12 @@ jobs:
           docker-compose build
           # Tag the images with your Docker Hub repository name and version
           docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-          # docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+          docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
           # docker tag demo_redis ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
           # docker tag db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
           # Push the images to Docker Hub
           docker push ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
-          # docker push ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+          docker push ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
           # docker push ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
           # docker push ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
         shell: bash

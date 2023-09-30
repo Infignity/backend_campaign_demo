@@ -17,21 +17,21 @@ jobs:
         image: redis
 
     steps:
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SHH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+    # - name: Deploy to Server
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.SSH_HOST }}
+    #     username: ${{ secrets.SHH_USER }}
+    #     key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # - name: Delete old docker campaign images
-      #   run: |
-      #     sudo docker stop campaign_celery || true
-      #     sudo docker rm campaign_celery || true
-      #     sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
-      #   continue-on-error: true
+      - name: Delete old docker campaign images
+        run: |
+          sudo docker stop campaign_celery || true
+          sudo docker rm campaign_celery || true
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest || true
+        # continue-on-error: true
 
-      # - name: Delete old docker Celery images
+      - name: Delete old docker Celery images
         run: |
           sudo docker stop campaign_demo || true
           sudo docker rm campaign_demo || true
@@ -40,11 +40,11 @@ jobs:
           cd demo && docker compose up -d
         # continue-on-error: true
 
-      # - name: Pull the Docker Campaign Celery Images
-      #   run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+      - name: Pull the Docker Campaign Celery Images
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
-      # - name: Pull the Docker Celery Demo Images
-      #   run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
+      - name: Pull the Docker Celery Demo Images
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
 
-      # - name: Run the images
-      #   run: cd demo && docker compose up -d
+      - name: Run the images
+        run: cd demo && docker compose up -d
