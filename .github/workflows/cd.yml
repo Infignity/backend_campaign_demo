@@ -30,19 +30,19 @@ jobs:
 
       - name: Delete old Docker campaign_celery container
         run: |
-          sudo docker stop campaign_celery || true
-          sudo docker rm -f campaign_celery || true
+          docker stop campaign_celery || true
+          docker rm -f campaign_celery || true
 
       - name: Pull the Docker Campaign Celery Image
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
       - name: Run the Docker Campaign Celery Container
-        run: sudo docker run -d -p 5555:5555 --name campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+        run: docker run -d -p 5555:5555 --name campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
       - name: Delete old Docker campaign_demo container
         run: |
-          sudo docker stop campaign_demo || true
-          sudo docker rm -f campaign_demo || true
+          docker stop campaign_demo || true
+          docker rm -f campaign_demo || true
 
       - name: Pull the Docker Campaign Demo Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
