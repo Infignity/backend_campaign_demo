@@ -30,7 +30,7 @@ jobs:
           # Tag the images with container names
           docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
           docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
-          docker tag postgres_db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
+          docker tag demo_db ${{ secrets.DOCKER_USERNAME }}/postgres_db:lastest
           docker tag redis ${{ secrets.DOCKER_USERNAME }}/campaign_redis:lastest
           
         shell: bash
