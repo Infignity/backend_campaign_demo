@@ -33,13 +33,13 @@ services:
     ports:
       - "6379:6379"
   # configuring nginx
-  nginx:
-    container_name: nginx_campaign
-    build: ./nginx/
-    ports:
-      - 80:80
-    depends_on:
-      - app
+  # nginx:
+  #   container_name: nginx_campaign
+  #   build: ./nginx/
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - app
   # celery 
   celery:
     container_name: campaign_celery
