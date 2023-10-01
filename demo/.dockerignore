@@ -1,8 +1,9 @@
 .venv
-.env
+.env.sample
 # Git
 .git
 .gitignore
+.env
 
 # Docker
 .docker
@@ -12,7 +13,6 @@ campaign/__pycache__/
 campaign/*/__pycache__/
 campaign/*/*/__pycache__/
 campaign/*/*/*/__pycache__/
-.env/
 .venv/
 venv/
 

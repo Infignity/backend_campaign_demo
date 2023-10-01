@@ -14,10 +14,10 @@ DEBUG = os.environ.get('DEBUG') == 'TRUE',
 ALLOWED_HOSTS = ['*']
 
 # BROKER_URL = 'redis://127.0.0.1:6379/0'
-# CELERY_BROKER_URL = os.environ.get('REDIS_URL')
-# CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+# CELERY_BROKER_URL = 'redis://redis:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -72,13 +72,11 @@ WSGI_APPLICATION = 'demo.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': os.environ.get('DB_ENGINE', ''),
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
         'NAME': os.environ.get('DB_NAME', 'postgres'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASS', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
@@ -106,8 +104,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            # "hosts": [(os.environ.get('REDIS_HOST', 'localhost'), 6379)],
-            'hosts': [('redis', 6379)]
+            "hosts": [(os.environ.get('REDIS_HOST', 'localhost'), 6379)],
+            # 'hosts': [('redis', 6379)]
         },
     },
 }

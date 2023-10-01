@@ -5,6 +5,8 @@ venv
 
 .env
 demo/.env
+demo/.env.prod
+demo/.env.dev
 *.pkl
 demo/main.py
 

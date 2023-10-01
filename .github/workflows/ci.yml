@@ -24,7 +24,7 @@ jobs:
           # Navigate to the docker-compose.yml file
           cd demo
           # Build the Docker images using Docker Compose
-          docker-compose build
+          docker-compose -f docker-compose-prod.yml build
           # Tag the images with your Docker Hub repository name and version
           docker tag demo_app ${{ secrets.DOCKER_USERNAME }}/campaign_demo:lastest
           docker tag demo_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest

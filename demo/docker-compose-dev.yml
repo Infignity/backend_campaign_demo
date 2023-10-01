@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   db:
@@ -6,9 +6,9 @@ services:
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=project
-      - POSTGRES_PASSWORD=project123
-      - POSTGRES_DB=campaign_demo
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
     volumes:
@@ -20,17 +20,32 @@ services:
 
   app:
     container_name: campaign_demo
-    build: 
+    build:
       context: .
+      dockerfile: Dockerfile
     ports:
       - 8000:8000
     env_file:
-      - ./.env
-    command: python manage.py runserver 0.0.0.0:8000
+      - /.env
+    command: gunicorn demo.wsgi --bind 0.0.0.0:8000
     depends_on:
+      - db
+    links:
       - db
     volumes:
       - ./app/:/usr/src/app/
+
+  # configuring nginx
+  nginx:
+    container_name: nginx_campaign
+    build:
+      context: ./
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    volumes:
+      - .:/app
 
   # celery 
   celery:
