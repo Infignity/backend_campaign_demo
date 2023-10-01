@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  app:
+    container_name: campaign_demo
+    build:
+      context: .
+      dockerfile: Dockerfile-Prod
+    expose:
+      - 8000
+    env_file:
+      - .env.prod
+    command: gunicorn demo.wsgi:application --bind 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/code
   db:
     image: postgres:15
     container_name: postgres_db
@@ -22,23 +37,9 @@ services:
     container_name: nginx_campaign
     build: ./nginx/
     ports:
-      - 1337:80
+      - 80:80
     depends_on:
       - app
-
-  app:
-    container_name: campaign_demo
-    build:
-      context: .
-    expose:
-      - 8000
-    env_file:
-      - .env.prod
-    command: python usr.src.app.wsgi --bind 0.0.0.0:8000
-    depends_on:
-      - db
-    # volumes:
-    #   - ./app/:/usr/src/app/
   # celery 
   celery:
     container_name: campaign_celery
@@ -47,7 +48,7 @@ services:
       context: .
     command: celery -A demo worker -l DEBUG
     volumes:
-      - .:/app
+      - .:/code
     env_file:
       - .env.prod
     depends_on:
@@ -55,5 +56,8 @@ services:
       - redis
       - app
 
+
 volumes:
   postgres_data:
+
+
