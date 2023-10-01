@@ -17,7 +17,7 @@ jobs:
         run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - name: Create an env file
         run: |
-          echo "${{ secrets.magicpith_env }}" > demo/.env
+          echo "${{ secrets.magicpith_env }}" > demo/.env.prod
         shell: bash
       - name: Build the Docker images using Docker Compose
         run: |
