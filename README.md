@@ -105,6 +105,9 @@ docker prune
 docker-compose exec app python manage.py flush --no-input
 docker-compose exec app python manage.py migrate
 
+# triggering certbot
+docker-compose -f docker-compose.deploy.yml run --rm certbot /opt/certify-init.sh
+
 ```
 
 # major dependencies

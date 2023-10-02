@@ -21,5 +21,8 @@ RUN pip install -r requirements.txt
 # Copy project files to the Docker app directory
 COPY . .
 
+RUN adduser --disabled-password --no-create-home magicpitch
+USER magicpitch
 
-ENTRYPOINT [  ]
+
+CMD ["uwsgi", "--socket", ":8000", "--workers", "6", "--master", "--enable-threads", "--module", "demo.wsgi"  ]
