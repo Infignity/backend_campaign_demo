@@ -8,10 +8,6 @@ if [ ! -f "/vol/proxy/ssl-dhparams.pem" ]; then
   openssl dhparam -out /vol/proxy/ssl-dhparams.pem 2048
 fi
 
-# Avoid replacing these with envsub-stitues
-export host=\$host
-export request_uri=\$request_uri
-
 echo "Checking for fullchain.pem"
 if [ ! -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
   echo "No SSL cert, enabling HTTP only..."
@@ -21,4 +17,4 @@ else
   envsubst < /etc/nginx/default-ssl.conf.tpl > /etc/nginx/conf.d/default.conf
 fi
 
-nginx -g 'daemon off;'
+nginx-debug -g 'daemon off;'

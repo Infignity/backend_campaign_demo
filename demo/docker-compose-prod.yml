@@ -118,6 +118,7 @@ services:
       - redis
       - app
 
+
 volumes:
   postgres_data:
   certbot-web:
