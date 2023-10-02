@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Prod
-    restart: always
     expose:
       - 8000
     env_file:
