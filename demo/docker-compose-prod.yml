@@ -120,8 +120,6 @@ services:
 
 volumes:
   postgres_data:
-  # certbot-web:
-  # proxy-dhparams:
-  # certbot-certs: 
-
-
+  certbot-web:
+  proxy-dhparams:
+  certbot-certs:
