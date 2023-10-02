@@ -1,5 +1,4 @@
-# Use Python 3.11 image as a base image
-FROM python:3.11-alphine
+FROM python:3.10-alphine3.16
 
 # set work directory
 WORKDIR /code
