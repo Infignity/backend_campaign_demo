@@ -106,7 +106,7 @@ docker-compose exec app python manage.py flush --no-input
 docker-compose exec app python manage.py migrate
 
 # triggering certbot
-docker-compose -f docker-compose.deploy.yml run --rm certbot /opt/certify-init.sh
+docker-compose -f docker-compose-prod.yml run --rm certbot /opt/certify-init.sh
 
 ```
 

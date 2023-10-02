@@ -25,4 +25,4 @@ RUN adduser --disabled-password --no-create-home magicpitch
 USER magicpitch
 
 
-CMD ["uwsgi", "--socket", ":8000", "--workers", "6", "--master", "--enable-threads", "--module", "demo.wsgi"  ]
+# CMD ["uwsgi", "--socket", ":8000", "--workers", "6", "--master", "--enable-threads", "--module", "demo.wsgi"  ]

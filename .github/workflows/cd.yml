@@ -36,8 +36,8 @@ jobs:
       - name: Pull the Docker Campaign Celery Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
-      - name: Run the Docker Campaign Celery Container
-        run: docker run -d -p 5555:5555 --name campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
+      # - name: Run the Docker Campaign Celery Container
+      #   run: docker run -d -p 5555:5555 --name campaign_celery ${{ secrets.DOCKER_USERNAME }}/campaign_celery:lastest
 
       - name: Delete old Docker campaign_demo container
         run: |
