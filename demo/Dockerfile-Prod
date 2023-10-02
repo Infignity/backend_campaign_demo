@@ -1,4 +1,5 @@
-FROM python:3.11.0-alphine
+# Use Python 3.11 image as a base image
+FROM python:3.11.4-slim-buster
 
 # set work directory
 WORKDIR /code
@@ -8,11 +9,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Install system dependencies
-RUN apk add --upgrade --no-cache build-base linux-headers
-    # apt-get update && apt-get\
-    # install -y \
-    # build-essential \
-    # netcat
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    netcat
 
 # install dependencies
 RUN pip install --upgrade pip
