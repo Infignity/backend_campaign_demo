@@ -4,7 +4,7 @@
 
 set -e
 
-until nc -z proxy 80; do
+until nc -z proxy 443; do
     echo "Waiting for proxy..."
     sleep 5s & wait ${!}
 done
