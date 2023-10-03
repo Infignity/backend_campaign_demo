@@ -78,7 +78,6 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile-Prod
     command: celery -A demo worker -l DEBUG
     volumes:
       - .:/code
