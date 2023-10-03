@@ -10,7 +10,7 @@ WORKDIR /app
 COPY ./requirements.txt .
 RUN apk add --no-cache --virtual --upgrade build-base linux-headers && \
     pip install --upgrade pip && \
-    && pip install -r requirements.txt
+    pip install -r requirements.txt
 
 # Now multistage build
 FROM python:3.9-alpine
