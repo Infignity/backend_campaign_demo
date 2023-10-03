@@ -1,25 +1,16 @@
-version: '3.8'
-
+version: "3.9"
+   
 services:
-  app:
-    container_name: campaign_demo
-    build:
-      context: .
-      dockerfile: Dockerfile-Prod
-    expose:
-      - 8000
-    env_file:
-      - .env.prod
-    command: gunicorn demo.wsgi:application --bind 0.0.0.0:8000
-    # environment:
-    #   - DEBUG=0
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - .:/code
+  redis:
+    container_name: redis
+    image: redis:6.2.7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
   db:
-    image: postgres:15
+    image: postgres:alpine
     container_name: postgres_db
     restart: unless-stopped
     environment:
@@ -28,79 +19,60 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
 
-  redis:
-    image: redis
-    container_name: campaign_redis
-    ports:
-      - "6379:6379"
-
-  nginx:
-    container_name: nginx
-    restart: unless-stopped
-    image: nginx
-    # command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  backend:
+    build: 
+      context: .
+      dockerfile: dockerfiles/prod/django/Dockerfile
+    container_name: backend
+    command: sh -c "gunicorn --bind 0.0.0.0:8000 demo.wsgi:application"
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    expose:
+      - "8000"
     env_file:
       - .env.prod
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
     depends_on:
-      - app
-
-  #     # - ./data/nginx/conf_ssl.d:/etc/nginx/
-  #     # nginx.conf
-     
-
+      - db
+      - redis
+  
   certbot:
-    image: certbot/certbot
+    build: 
+      context: ./dockerfiles/prod/certbot/
+    command: echo "Skipping..."
     container_name: certbot
-    restart: unless-stopped
-    # entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 5d & wait $${!}; done;'"
     env_file:
       - .env.prod
     volumes: 
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email yashwant@magicpitch.ai -d zoominfosales.tech --agree-tos
-  
-  # proxy:
-  #   build:
-  #     context: ./docker/proxy
-  #   restart: always
-  #   depends_on:
-  #     - app
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     - certbot-web:/vol/www
-  #     - proxy-dhparams:/vol/proxy
-  #     - certbot-certs:/etc/letsencrypt
-  #   env_file:
-  #     - .env.prod
-  #   # environment:
-  #   #   - DOMAIN=${DOMAIN}
+      - certbot_www_volume:/vol/www/
+      - certbot_certs_volume:/etc/letsencrypt/
+    depends_on:
+      - nginx
 
-  # certbot:
-  #   build:
-  #     context: ./docker/certbot
-  #   command: echo "Skipping @cerbort config..."
-  #   env_file:
-  #     - .env.prod
-  #   # environment:
-  #   #   - EMAIL=${ACME_DEFAULT_EMAIL}
-  #   #   - DOMAIN=${DOMAIN}
-  #   volumes:
-  #     - certbot-web:/vol/www
-  #     - certbot-certs:/etc/letsencrypt/
-  #   depends_on:
-  #     - proxy
-  
+  nginx:
+    container_name: nginx
+    build:
+      context: ./dockerfiles/prod/nginx/
+    restart: always
+    env_file:
+      - .env.prod
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - static_volume:/home/app/static
+      - media_volume:/home/app/media
+      - certbot_www_volume:/vol/www/
+      - proxy_dhparams:/vol/proxy
+      - certbot_certs_volume:/etc/letsencrypt/
+
+    depends_on:
+      - backend
+
   celery:
     container_name: campaign_celery
     restart: always
@@ -115,11 +87,12 @@ services:
     depends_on:
       - db
       - redis
-      - app
-
+      - backend
 
 volumes:
   postgres_data:
-  # certbot-web:
-  # proxy-dhparams:
-  # certbot-certs:
+  static_volume:
+  media_volume:
+  certbot_www_volume:
+  certbot_certs_volume:
+  proxy_dhparams:
