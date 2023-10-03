@@ -80,7 +80,7 @@ services:
       context: .
     command: celery -A demo worker -l DEBUG
     volumes:
-      - .:/code
+      - .:/app
     env_file:
       - .env.prod
     depends_on:
